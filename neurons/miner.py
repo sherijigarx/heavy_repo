@@ -140,13 +140,6 @@ def main(config):
     # Check the supplied model and log the appropriate information.
     # =========================================== Text To Speech model selection ============================================ 
     try:
-        if config.model == "elevenlabs/eleven" and config.eleven_api is not None:
-            bt.logging.info(f"Using the Text-To-Speech with the supplied model: {config.model}")
-            tts_models = ElevenLabsTTS(config.eleven_api)
-        else:
-            bt.logging.error(f"Eleven Labs API key is required for the model: {config.model}")
-            exit(1)     
-
         if config.ms_model_path:
             bt.logging.info(f"Using the Microsoft TTS with the supplied model from provided directory: {config.ms_model_path}")
             tts_models = TextToSpeechModels(model_path=config.ms_model_path)
@@ -154,21 +147,26 @@ def main(config):
             bt.logging.info("Using the Text-To-Speech with the supplied model: microsoft/speecht5_tts")
             tts_models = TextToSpeechModels(model_path=config.model)
 
-
-        if config.fb_model_path:
+        elif config.fb_model_path:
             bt.logging.info(f"Using the Facebook TTS with the supplied model from provided directory: {config.fb_model_path}")
             tts_models = EnglishTextToSpeech(model_path=config.fb_model_path)
         elif config.model == "facebook/mms-tts-eng":
             bt.logging.info("Using the Text-To-Speech with the supplied model: facebook/mms-tts-eng")
             tts_models = EnglishTextToSpeech(model_path=config.model)
 
-
-        if config.bark_model_path:
+        elif config.bark_model_path:
             bt.logging.info(f"Using the SunoBark with the supplied model from provided directory: {config.bark_model_path}")
             tts_models = SunoBark(model_path=config.bark_model_path)
         elif config.model == "suno/bark":
             bt.logging.info("Using the Text-To-Speech with the supplied model: suno/bark")
             tts_models = SunoBark(model_path=config.model)
+
+        elif config.model == "elevenlabs/eleven" and config.eleven_api is not None:
+            bt.logging.info(f"Using the Text-To-Speech with the supplied model: {config.model}")
+            tts_models = ElevenLabsTTS(config.eleven_api)
+        else:
+            bt.logging.error(f"Eleven Labs API key is required for the model: {config.model}")
+            exit(1)     
 
     # =========================================== Text To Speech model selection ============================================
     
