@@ -1609,11 +1609,7 @@ class ModelLoader:
 
 
    def load_tokenizer(self):
-       if self.model_dir:
-           model_path = os.path.join(self.model_dir, 'tokenizer.pth')
-       else:
-            model_path = HuBERTManager.make_sure_tokenizer_installed()
-       return CustomTokenizer.load_from_checkpoint(model_path).to(self.device)
+       return CustomTokenizer.load_from_checkpoint('data/models/hubert/tokenizer.pth').to(self.device)
    
 
 class AudioProcessor:
