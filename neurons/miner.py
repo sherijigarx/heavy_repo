@@ -72,7 +72,7 @@ import lib
 def get_config():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--model", default='microsoft/speecht5_tts', help="The model to be used for text-to-speech." 
+        "--model", default='', help="The model to be used for text-to-speech." 
     )
     parser.add_argument(
         "--ms_model_path", default=None , help="The microsoft tts model to be used for text-to-speech." 
