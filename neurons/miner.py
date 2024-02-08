@@ -147,14 +147,14 @@ def main(config):
             bt.logging.info("Using the Text-To-Speech with the supplied model: microsoft/speecht5_tts")
             tts_models = TextToSpeechModels(model_path=config.model)
 
-        elif config.fb_model_path:
+        if config.fb_model_path:
             bt.logging.info(f"Using the Facebook TTS with the supplied model from provided directory: {config.fb_model_path}")
             tts_models = EnglishTextToSpeech(model_path=config.fb_model_path)
         elif config.model == "facebook/mms-tts-eng":
             bt.logging.info("Using the Text-To-Speech with the supplied model: facebook/mms-tts-eng")
             tts_models = EnglishTextToSpeech(model_path=config.model)
 
-        elif config.bark_model_path:
+        if config.bark_model_path:
             bt.logging.info(f"Using the SunoBark with the supplied model from provided directory: {config.bark_model_path}")
             tts_models = SunoBark(model_path=config.bark_model_path)
         elif config.model == "suno/bark":
