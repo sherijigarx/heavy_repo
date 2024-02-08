@@ -1582,12 +1582,14 @@ def codec_decode(fine_tokens):
 
 
 class ModelLoader:
-   def __init__(self):
-       self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-       self.model = self.load_codec_model()
-       self.hubert_manager = self.load_hubert_manager()
-       self.hubert_model = self.load_hubert_model()
-       self.tokenizer = self.load_tokenizer()
+   def __init__(self, model_dir=None):
+        self.model_dir = model_dir
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.model = self.load_codec_model()
+        self.hubert_manager = self.load_hubert_manager()
+        self.hubert_model = self.load_hubert_model()
+        self.tokenizer = self.load_tokenizer()
+
 
    def load_codec_model(self):
        return load_codec_model(use_gpu=True if self.device == 'cuda' else False)
@@ -1599,10 +1601,19 @@ class ModelLoader:
        return hubert_manager
 
    def load_hubert_model(self):
-       return CustomHubert(checkpoint_path='data/models/hubert/hubert.pt').to(self.device)
+        if self.model_dir:
+            model_path = os.path.join(self.model_dir, 'hubert.pt')  # Adjust the filename as needed
+        else:
+            model_path = HuBERTManager.make_sure_hubert_installed()  # This assumes the method downloads or locates the model
+        return CustomHubert(checkpoint_path=model_path).to(self.device)
+
 
    def load_tokenizer(self):
-       return CustomTokenizer.load_from_checkpoint('data/models/hubert/tokenizer.pth').to(self.device)
+       if self.model_dir:
+           model_path = os.path.join(self.model_dir, 'tokenizer.pth')
+       else:
+            model_path = HuBERTManager.make_sure_tokenizer_installed()
+       return CustomTokenizer.load_from_checkpoint(model_path).to(self.device)
    
 
 class AudioProcessor:
@@ -1642,109 +1653,28 @@ class Encoder:
        return codes
 
 
-# class AudioGenerator:
-#   def __init__(self, text_prompt, voice_name):
-#       self.text_prompt = text_prompt
-#       self.voice_name = voice_name
-
-#   def generate_audio(self):
-#       preload_models(
-#           text_use_gpu=True,
-#           text_use_small=False,
-#           coarse_use_gpu=True,
-#           coarse_use_small=False,
-#           fine_use_gpu=True,
-#           fine_use_small=False,
-#           codec_use_gpu=True,
-#           force_reload=False,
-#           path="models"
-#       )
-
-#       # Generation with more control
-#       x_semantic = generate_text_semantic(
-#           self.text_prompt,
-#           history_prompt=self.voice_name,
-#           temp=0.7,
-#           top_k=50,
-#           top_p=0.95,
-#       )
-
-#       x_coarse_gen = generate_coarse(
-#           x_semantic,
-#           history_prompt=self.voice_name,
-#           temp=0.7,
-#           top_k=50,
-#           top_p=0.95,
-#       )
-
-#       x_fine_gen = generate_fine(
-#           x_coarse_gen,
-#           history_prompt=self.voice_name,
-#           temp=0.5,
-#       )
-
-#       audio_array = codec_decode(x_fine_gen)
-
-#       return audio_array
-
-
-# class BarkVoiceCloning:
-#     def __init__(self) -> None:
-#         pass
-
-#     def clone_voice(self, prompt, voice_name, input_audio_file, model_loader=None):
-#         device = 'cuda' if torch.cuda.is_available() else 'cpu'
-#         # model_loader = ModelLoader(device)
-#         # Process audio
-#         try:
-#             audio_processor = AudioProcessor(input_audio_file, model_loader.model, device)
-#             processed_audio = audio_processor.process_audio()
-#         except:
-#             raise Exception(f"Audio file not found or model issue: {model_loader.model}")
-#         # Generate semantic tokens
-#         semantic_generator = SemanticGenerator(model_loader.hubert_model, model_loader.tokenizer, processed_audio, model_loader.model)
-#         semantic_tokens = semantic_generator.generate_semantic_tokens()
-
-#         # Encode audio
-#         encoder = Encoder(model_loader.model, processed_audio)
-#         codes = encoder.encode()
-
-#         # Get the current file location
-#         current_file_location = os.path.dirname(os.path.abspath(__file__))
-
-#         # Create 'assets' and 'prompts' directories
-#         assets_directory = os.path.join(current_file_location, 'assets')
-#         prompts_directory = os.path.join(assets_directory, 'prompts')
-
-#         os.makedirs(prompts_directory, exist_ok=True)
-
-#         # Save prompts
-#         output_path = os.path.join(prompts_directory, voice_name + '.npz')
-#         np.savez(output_path, fine_prompt=codes.cpu(), coarse_prompt=codes[:2, :].cpu(), semantic_prompt=semantic_tokens.cpu())
-#         audio_generator = AudioGenerator(prompt, voice_name)
-#         audio_array = audio_generator.generate_audio()
-
-#         return audio_array
-    
 class AudioGenerator:
-  def __init__(self):   
-    preload_models(
-        text_use_gpu=True,
-        text_use_small=True,
-        coarse_use_gpu=True,
-        coarse_use_small=True,
-        fine_use_gpu=True,
-        fine_use_small=True,
-        codec_use_gpu=True,
-        force_reload=False,
-        path="models"
-    )
+  def __init__(self, text_prompt, voice_name):
+      self.text_prompt = text_prompt
+      self.voice_name = voice_name
 
-  def generate_audio(self, text_prompt, voice_name):
+  def generate_audio(self):
+      preload_models(
+          text_use_gpu=True,
+          text_use_small=False,
+          coarse_use_gpu=True,
+          coarse_use_small=False,
+          fine_use_gpu=True,
+          fine_use_small=False,
+          codec_use_gpu=True,
+          force_reload=False,
+          path="models"
+      )
+
       # Generation with more control
       x_semantic = generate_text_semantic(
-          text_prompt,
-          history_prompt=voice_name,
+          self.text_prompt,
+          history_prompt=self.voice_name,
           temp=0.7,
           top_k=50,
           top_p=0.95,
@@ -1752,7 +1682,7 @@ class AudioGenerator:
 
       x_coarse_gen = generate_coarse(
           x_semantic,
-          history_prompt=voice_name,
+          history_prompt=self.voice_name,
           temp=0.7,
           top_k=50,
           top_p=0.95,
@@ -1760,7 +1690,7 @@ class AudioGenerator:
 
       x_fine_gen = generate_fine(
           x_coarse_gen,
-          history_prompt=voice_name,
+          history_prompt=self.voice_name,
           temp=0.5,
       )
 
@@ -1768,11 +1698,11 @@ class AudioGenerator:
 
       return audio_array
 
+
 class BarkVoiceCloning:
-    def __init__(self, model_loader) -> None:
-        self.semantic_generator = SemanticGenerator(model_loader.hubert_model, model_loader.tokenizer, model_loader.model)
-        self.encoder = Encoder(model_loader.model)
-        self.audio_generator = AudioGenerator()
+    def __init__(self) -> None:
+        pass
+
     def clone_voice(self, prompt, voice_name, input_audio_file, model_loader=None):
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
         # model_loader = ModelLoader(device)
@@ -1783,11 +1713,12 @@ class BarkVoiceCloning:
         except:
             raise Exception(f"Audio file not found or model issue: {model_loader.model}")
         # Generate semantic tokens
-        
-        semantic_tokens = self.semantic_generator.generate_semantic_tokens(processed_audio)
+        semantic_generator = SemanticGenerator(model_loader.hubert_model, model_loader.tokenizer, processed_audio, model_loader.model)
+        semantic_tokens = semantic_generator.generate_semantic_tokens()
 
         # Encode audio
-        codes = self.encoder.encode(processed_audio)
+        encoder = Encoder(model_loader.model, processed_audio)
+        codes = encoder.encode()
 
         # Get the current file location
         current_file_location = os.path.dirname(os.path.abspath(__file__))
@@ -1801,6 +1732,7 @@ class BarkVoiceCloning:
         # Save prompts
         output_path = os.path.join(prompts_directory, voice_name + '.npz')
         np.savez(output_path, fine_prompt=codes.cpu(), coarse_prompt=codes[:2, :].cpu(), semantic_prompt=semantic_tokens.cpu())
-        audio_array = self.audio_generator.generate_audio(prompt, voice_name)
+        audio_generator = AudioGenerator(prompt, voice_name)
+        audio_array = audio_generator.generate_audio()
 
         return audio_array
