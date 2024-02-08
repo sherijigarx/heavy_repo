@@ -465,13 +465,13 @@ def main(config):
 
     def ProcessSpeech(synapse: lib.protocol.TextToSpeech) -> lib.protocol.TextToSpeech:
         bt.logging.success("The prompt received from validator!")
-        if config.model == "microsoft/speecht5_tts":
+        if config.ms_model_path or config.model == "microsoft/speecht5_tts":
             speech = tts_models.generate_speech(synapse.text_input)
         elif config.model == "elevenlabs/eleven":
             speech = tts_models.generate_speech(synapse.text_input)
-        elif config.model == "suno/bark":
+        elif config.bark_model_path or config.model == "suno/bark":
             speech = tts_models.generate_speech(synapse.text_input)
-        elif config.model == "facebook/mms-tts-eng":
+        elif config.fb_model_path or config.model == "facebook/mms-tts-eng":
             speech = tts_models.generate_speech(synapse.text_input)
             audio_data = speech / torch.max(torch.abs(speech))
 
