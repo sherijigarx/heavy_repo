@@ -72,7 +72,16 @@ import lib
 def get_config():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--model", default= 'microsoft/speecht5_tts' , help="The model to be used for text-to-speech." 
+        "--model", default='microsoft/speecht5_tts', help="The model to be used for text-to-speech." 
+    )
+    parser.add_argument(
+        "--ms_model_path", default=None , help="The microsoft tts model to be used for text-to-speech." 
+    )
+    parser.add_argument(
+        "--fb_model_path", default=None , help="The facebook tts model to be used for text-to-speech." 
+    )
+    parser.add_argument(
+        "--bark_model_path", default=None , help="The bark tts model to be used for text-to-speech." 
     )
     parser.add_argument(
         "--clone_model", default= 'bark/voiceclone' , help="The model to be used for Voice cloning." 
@@ -131,16 +140,31 @@ def main(config):
     # Check the supplied model and log the appropriate information.
     # =========================================== Text To Speech model selection ============================================ 
     try:
-        if config.model == "microsoft/speecht5_tts":
-            bt.logging.info("Using the TextToSpeechModels with the supplied model: microsoft/speecht5_tts")
-            tts_models = TextToSpeechModels()
+        if config.ms_model_path:
+            bt.logging.info(f"Using the Microsoft TTS with the supplied model from provided directory: {config.ms_model_path}")
+            tts_models = TextToSpeechModels(model_path=config.ms_model_path)
+        elif config.model == "microsoft/speecht5_tts":
+            bt.logging.info("Using the Text-To-Speech with the supplied model: microsoft/speecht5_tts")
+            tts_models = TextToSpeechModels(model_path=config.model)
+
+
+        if config.fb_model_path:
+            bt.logging.info(f"Using the Facebook TTS with the supplied model from provided directory: {config.fb_model_path}")
+            tts_models = EnglishTextToSpeech(model_path=config.fb_model_path)
         elif config.model == "facebook/mms-tts-eng":
-            bt.logging.info("Using the English Text-to-Speech with the supplied model: facebook/mms-tts-eng")
-            tts_models = EnglishTextToSpeech()
+            bt.logging.info("Using the Text-To-Speech with the supplied model: facebook/mms-tts-eng")
+            tts_models = EnglishTextToSpeech(model_path=config.model)
+
+
+        if config.bark_model_path:
+            bt.logging.info(f"Using the SunoBark with the supplied model from provided directory: {config.bark_model_path}")
+            tts_models = SunoBark(model_path=config.bark_model_path)
         elif config.model == "suno/bark":
-            bt.logging.info("Using the SunoBark with the supplied model: suno/bark")
-            tts_models = SunoBark()
-        elif config.model == "elevenlabs/eleven" and config.eleven_api is not None:
+            bt.logging.info("Using the Text-To-Speech with the supplied model: suno/bark")
+            tts_models = SunoBark(model_path=config.model)
+
+
+        if config.model == "elevenlabs/eleven" and config.eleven_api is not None:
             bt.logging.info(f"Using the Text-To-Speech with the supplied model: {config.model}")
             tts_models = ElevenLabsTTS(config.eleven_api)
         else:
