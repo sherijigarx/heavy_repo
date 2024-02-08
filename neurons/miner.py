@@ -215,7 +215,6 @@ def main(config):
         tags.append(lib.__version__)
         return tags
 
-    use_wandb = True
     # Each miner gets a unique identity (UID) in the network for differentiation.
     my_subnet_uid = metagraph.hotkeys.index(wallet.hotkey.ss58_address)
     bt.logging.info(f"Running miner on uid: {my_subnet_uid}")
@@ -224,7 +223,7 @@ def main(config):
     sys_info = get_system_info()
     commit = get_git_commit_hash()
 
-    if use_wandb:
+    def start_wandb_run():
         wandb.init(
             name=name,
             project="subnet16", 
@@ -239,6 +238,9 @@ def main(config):
                 allow_val_change=True,
                 tags=sys_info
             )
+    start_wandb_run()  # Start the first WandB run
+    start_time = time.time()  # Mark the start time
+
 ############################### Voice Clone ##########################################
 
     # The blacklist function decides if a request should be ignored.
@@ -650,6 +652,12 @@ def main(config):
     step = 0
     while True:
         try:
+            current_time = time.time()
+            elapsed_time = current_time - start_time
+            if elapsed_time >= 14400:  # 4 hours = 14400 seconds
+                wandb.finish()  # Finish the current run
+                start_wandb_run()  # Start a new run
+                start_time = time.time()  # Reset the start time
             # TODO(developer): Define any additional operations to be performed by the miner.
             # Below: Periodically update our knowledge of the network graph.
             if step % 500 == 0:

@@ -37,7 +37,7 @@ class TextToSpeechService(AIModelService):
         self.last_reset_weights_block = self.current_block
         self.islocaltts = False
         self.p_index = 0
-        self.last_run_date = dt.date.today()
+        self.last_run_start_time = dt.datetime.now()
         self.tao = self.metagraph.neurons[self.uid].stake.tao
         
         ###################################### DIRECTORY STRUCTURE ###########################################
@@ -66,9 +66,12 @@ class TextToSpeechService(AIModelService):
             os.remove(os.path.join(self.tts_source_dir, 'tts_prompts.csv'))
         
     def check_and_update_wandb_run(self):
-        current_date = dt.date.today()
-        if current_date > self.last_run_date:
-            self.last_run_date = current_date
+        # Calculate the time difference between now and the last run start time
+        current_time = dt.datetime.now()
+        time_diff = current_time - self.last_run_start_time
+        # Check if 4 hours have passed since the last run start time
+        if time_diff.total_seconds() >= 4 * 3600:  # 4 hours * 3600 seconds/hour
+            self.last_run_start_time = current_time  # Update the last run start time to now
             if self.wandb_run:
                 wandb.finish()  # End the current run
             self.new_wandb_run()  # Start a new run
