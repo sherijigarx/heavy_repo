@@ -84,7 +84,7 @@ def get_config():
         "--music_model", default='facebook/musicgen-medium' , help="The model to be used for Music Generation." 
     )
     parser.add_argument(
-        "--music_path", default=None , help="The model to be used for Music Generation." 
+        "--music_path", default=None , help="The Finetuned model to be used for Music Generation." 
     )
     # Adds override arguments for network and netuid.
     parser.add_argument("--netuid", type=int, default=1, help="The chain subnet uid.")

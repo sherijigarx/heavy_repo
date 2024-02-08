@@ -1,3 +1,6 @@
+GPUtil
+funcy
+audiolm-pytorch
 elevenlabs==0.2.6
 bittensor
 torch
@@ -19,7 +22,3 @@ pydub
 audiocraft
 laion_clap
 pydantic==1.10.13
-
-GPUtil
-funcy
-audiolm-pytorch
