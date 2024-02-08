@@ -352,7 +352,7 @@ def main(config):
         try:
             bvc = BarkVoiceCloning()
             speech = bvc.clone_voice(text, hf_voice_id, source_file, voice_clone_model )
-            bark_clone_file_path = "bark_voice_gen.wav"
+            bark_clone_file_path = "bark_voice_gen.wav" # synapse.dendrite.hotkey + "_bark_voice_gen.wav"
             write_wav(bark_clone_file_path, rate=24000, data=speech)
             return bark_clone_file_path
         except Exception as e:
@@ -389,7 +389,7 @@ def main(config):
             input_tensor = torch.tensor(input_clone, dtype=torch.float32)
             if input_tensor.ndim == 1:
                 input_tensor = input_tensor.unsqueeze(0)
-            torchaudio.save('input.wav', src=input_tensor, sample_rate=sample_rate)
+            torchaudio.save('input.wav', src=input_tensor, sample_rate=sample_rate) # synapse.dendrite.hotkey + "_input.wav"
 
             # Check if the input text is valid.
             if input_text is None or input_text == "":
@@ -487,7 +487,7 @@ def main(config):
             audio_data_int = (audio_data * 2147483647).type(torch.IntTensor)
 
             # Save the audio data as integers
-            torchaudio.save('speech.wav', src=audio_data_int, sample_rate=16000)
+            torchaudio.save('speech.wav', src=audio_data_int, sample_rate=16000) # synapse.dendrite.hotkey + "_speech.wav"
             # Open the WAV file and read the frames
             sample_width = None
             try:
@@ -629,7 +629,7 @@ def main(config):
             try:
                 sampling_rate = 32000
                 # Assuming write_wav function exists and works as intended
-                write_wav("musicgen_out.wav", rate=sampling_rate, data=music)
+                write_wav("musicgen_out.wav", rate=sampling_rate, data=music) # synapse.dendrite.hotkey + "_musicgen_out.wav"
                 bt.logging.success(f"Text to Music has been generated! and saved to: musicgen_out.wav")
                 # Assuming convert_music_to_tensor function exists to convert WAV to tensor
                 music_tensor = convert_music_to_tensor("musicgen_out.wav")
