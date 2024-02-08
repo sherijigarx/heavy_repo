@@ -87,13 +87,13 @@ def get_config():
         "--clone_model", default= 'bark/voiceclone' , help="The model to be used for Voice cloning." 
     )
     parser.add_argument(
-        "--eleven_api", default=os.getenv('ELEVEN_API') , help="API key to be used for Eleven Labs." 
-    )
-    parser.add_argument(
         "--music_model", default='facebook/musicgen-medium' , help="The model to be used for Music Generation." 
     )
     parser.add_argument(
         "--music_path", default=None , help="The Finetuned model to be used for Music Generation." 
+    )
+    parser.add_argument(
+        "--eleven_api", default=os.getenv('ELEVEN_API') , help="API key to be used for Eleven Labs." 
     )
     # Adds override arguments for network and netuid.
     parser.add_argument("--netuid", type=int, default=1, help="The chain subnet uid.")
@@ -140,6 +140,13 @@ def main(config):
     # Check the supplied model and log the appropriate information.
     # =========================================== Text To Speech model selection ============================================ 
     try:
+        if config.model == "elevenlabs/eleven" and config.eleven_api is not None:
+            bt.logging.info(f"Using the Text-To-Speech with the supplied model: {config.model}")
+            tts_models = ElevenLabsTTS(config.eleven_api)
+        else:
+            bt.logging.error(f"Eleven Labs API key is required for the model: {config.model}")
+            exit(1)     
+
         if config.ms_model_path:
             bt.logging.info(f"Using the Microsoft TTS with the supplied model from provided directory: {config.ms_model_path}")
             tts_models = TextToSpeechModels(model_path=config.ms_model_path)
@@ -163,13 +170,6 @@ def main(config):
             bt.logging.info("Using the Text-To-Speech with the supplied model: suno/bark")
             tts_models = SunoBark(model_path=config.model)
 
-
-        if config.model == "elevenlabs/eleven" and config.eleven_api is not None:
-            bt.logging.info(f"Using the Text-To-Speech with the supplied model: {config.model}")
-            tts_models = ElevenLabsTTS(config.eleven_api)
-        else:
-            bt.logging.error(f"Eleven Labs API key is required for the model: {config.model}")
-            exit(1)     
     # =========================================== Text To Speech model selection ============================================
     
     # =========================================== Text To Music model selection ============================================
