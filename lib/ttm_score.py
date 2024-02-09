@@ -14,7 +14,6 @@ import os
 class MetricEvaluator:
     def __init__(self):
         self.pt_file = hf_hub_download(repo_id="lukewys/laion_clap", filename="630k-best.pt")
-        pass
 
     @staticmethod
     def calculate_snr(file_path):
