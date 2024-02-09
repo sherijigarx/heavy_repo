@@ -12,6 +12,9 @@ import subprocess
 import os
 
 class MetricEvaluator:
+    def __init__(self):
+        self.pt_file = hf_hub_download(repo_id="lukewys/laion_clap", filename="630k-best.pt")
+
     @staticmethod
     def calculate_snr(file_path):
         audio_signal, _ = librosa.load(file_path, sr=None)
@@ -30,11 +33,10 @@ class MetricEvaluator:
         smoothness /= len(amplitude_envelope) - 1
         return smoothness.item()
 
-    @staticmethod
-    def calculate_consistency(file_path, text):
+    def calculate_consistency(self, file_path, text):
         try:
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-            pt_file = hf_hub_download(repo_id="lukewys/laion_clap", filename="630k-best.pt")
+            pt_file = self.pt_file
             clap_metric = CLAPTextConsistencyMetric(pt_file).to(device)
             def convert_audio(audio, from_rate, to_rate, to_channels):
                 resampler = torchaudio.transforms.Resample(orig_freq=from_rate, new_freq=to_rate)
