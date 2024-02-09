@@ -33,11 +33,10 @@ class MetricEvaluator:
         smoothness /= len(amplitude_envelope) - 1
         return smoothness.item()
 
-    @staticmethod
-    def calculate_consistency(file_path, text):
+    def calculate_consistency(self, file_path, text):
         try:
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-            pt_file = isinstance.pt_file
+            pt_file = self.pt_file
             clap_metric = CLAPTextConsistencyMetric(pt_file).to(device)
             def convert_audio(audio, from_rate, to_rate, to_channels):
                 resampler = torchaudio.transforms.Resample(orig_freq=from_rate, new_freq=to_rate)
