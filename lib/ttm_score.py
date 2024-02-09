@@ -9,8 +9,10 @@ from classes.aimodel import AIModelService
 
 class MetricEvaluator(AIModelService):
     def __init__(self):
-        # super().__init__()
-        pass
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.p_file = self.pt_file
+        self.clap_metric = CLAPTextConsistencyMetric(self.p_file).to(self.device)
+        self.resampler = torchaudio.transforms.Resample(orig_freq=None, new_freq=48000)  # Adjust as necessary
 
     @staticmethod
     def calculate_snr(file_path):
@@ -32,24 +34,17 @@ class MetricEvaluator(AIModelService):
 
     def calculate_consistency(self, file_path, text):
         try:
-            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-            pt_file = self.pt_file
-            clap_metric = CLAPTextConsistencyMetric(pt_file).to(device)
-            def convert_audio(audio, from_rate, to_rate, to_channels):
-                resampler = torchaudio.transforms.Resample(orig_freq=from_rate, new_freq=to_rate)
-                audio = resampler(audio)
-                if to_channels == 1:
-                    audio = audio.mean(dim=0, keepdim=True)
-                return audio
-
             audio, sr = torchaudio.load(file_path)
-            audio = convert_audio(audio, from_rate=sr, to_rate=48000, to_channels=1)
+            audio = self.resampler(audio)
+            if audio.shape[0] > 1:
+                audio = audio.mean(dim=0, keepdim=True)
 
-            clap_metric.update(audio.unsqueeze(0), [text], torch.tensor([audio.shape[1]]), torch.tensor([48000]))
-            consistency_score = clap_metric.compute()
+            audio = audio.to(self.device)
+            self.clap_metric.update(audio.unsqueeze(0), [text], torch.tensor([audio.shape[1]]).to(self.device), torch.tensor([48000]).to(self.device))
+            consistency_score = self.clap_metric.compute()
             return consistency_score
         except Exception as e:
-            print(f"An error occurred -------------------: {e}")
+            print(f"An error occurred: {e}")
             return None
     
 
