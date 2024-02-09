@@ -18,7 +18,53 @@
 # DEALINGS IN THE SOFTWARE.
 
 
-# Base Class
+# # Base Class
+# import os
+# import sys
+# import asyncio
+
+# # Set the project root path
+# project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+# # Set the 'AudioSubnet' directory path
+# audio_subnet_path = os.path.abspath(project_root)
+
+# # Add the project root and 'AudioSubnet' directories to sys.path
+# sys.path.insert(0, project_root)
+# sys.path.insert(0, audio_subnet_path)
+
+# from classes.tts import TextToSpeechService 
+# from classes.vc import VoiceCloningService
+# from classes.ttm import MusicGenerationService
+
+
+
+
+# async def main():
+#     # AIModelService()
+
+#     ttm_service = MusicGenerationService()
+
+#     tts_service = TextToSpeechService()
+#     tts_service.new_wandb_run()
+
+#     vc_service = VoiceCloningService()
+
+#     vc_task = asyncio.create_task(vc_service.run_async())
+
+#     await asyncio.sleep(0.1)
+#     ttm_task = asyncio.create_task(ttm_service.run_async())
+
+#     await asyncio.sleep(0.1)
+#     tts_task = asyncio.create_task(tts_service.run_async())
+
+#     # Wait for both tasks to complete
+#     await asyncio.gather(vc_task, tts_task, ttm_task)
+
+# if __name__ == "__main__":
+#     asyncio.run(main())
+
+
+
 import os
 import sys
 import asyncio
@@ -36,29 +82,27 @@ from classes.tts import TextToSpeechService
 from classes.vc import VoiceCloningService
 from classes.ttm import MusicGenerationService
 
-
-
-
 async def main():
-    # AIModelService()
+    services = [
+        MusicGenerationService(),
+        TextToSpeechService(),
+        VoiceCloningService(),
+    ]
 
-    ttm_service = MusicGenerationService()
+    # Initialize an empty list to hold our tasks
+    tasks = []
 
-    tts_service = TextToSpeechService()
-    tts_service.new_wandb_run()
+    # Iterate through each service and create an asynchronous task for its run_async method
+    for service in services:
+        if isinstance(service, TextToSpeechService):
+            service.new_wandb_run()  # Initialize the Weights & Biases run if the service is TextToSpeechService
+        task = asyncio.create_task(service.run_async())
+        tasks.append(task)
 
-    vc_service = VoiceCloningService()
+        await asyncio.sleep(0.1)  # Short delay between task initializations if needed
 
-    vc_task = asyncio.create_task(vc_service.run_async())
-
-    await asyncio.sleep(0.1)
-    ttm_task = asyncio.create_task(ttm_service.run_async())
-
-    await asyncio.sleep(0.1)
-    tts_task = asyncio.create_task(tts_service.run_async())
-
-    # Wait for both tasks to complete
-    await asyncio.gather(vc_task, tts_task, ttm_task)
+    # Wait for all tasks to complete
+    await asyncio.gather(*tasks)
 
 if __name__ == "__main__":
     asyncio.run(main())
