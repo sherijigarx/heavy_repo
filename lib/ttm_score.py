@@ -56,23 +56,23 @@ class MetricEvaluator(AIModelService):
 
 class MusicQualityEvaluator:
     def __init__(self):
-        pass
+        self.metric_evaluator = MetricEvaluator()
 
     def evaluate_music_quality(self, file_path, text=None):
         try:
-            snr_value = MetricEvaluator.calculate_snr(file_path)
+            snr_value = self.metric_evaluator.calculate_snr(file_path)
             print(f'SNR: {snr_value} dB')
         except:
             print("SNR could not be calculated")
 
         try:
-            smoothness_score = MetricEvaluator.calculate_smoothness(file_path)
+            smoothness_score = self.metric_evaluator.calculate_smoothness(file_path)
             print(f'Smoothness Score: {smoothness_score}')
         except:
             print("Smoothness could not be calculated")
 
         try:
-            consistency_score = MetricEvaluator.calculate_consistency(file_path, text)
+            consistency_score = self.metric_evaluator.calculate_consistency(file_path, text)
             print(f"Consistency Score: {consistency_score}")
         except:
             print("Consistency could not be calculated")
