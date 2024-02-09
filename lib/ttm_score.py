@@ -1,17 +1,17 @@
+from huggingface_hub import hf_hub_download
+from transformers import AutoProcessor, MusicgenForConditionalGeneration
+import scipy.io.wavfile
 import numpy as np
 import librosa
 import torch
 import torchaudio
 from scipy.signal import hilbert
+from pathlib import Path
 from audiocraft.metrics import CLAPTextConsistencyMetric
-from classes.aimodel import AIModelService
+import subprocess
+import os
 
-
-class MetricEvaluator(AIModelService):
-    def __init__(self):
-        # super().__init__()
-        pass
-
+class MetricEvaluator:
     @staticmethod
     def calculate_snr(file_path):
         audio_signal, _ = librosa.load(file_path, sr=None)
@@ -30,10 +30,11 @@ class MetricEvaluator(AIModelService):
         smoothness /= len(amplitude_envelope) - 1
         return smoothness.item()
 
-    def calculate_consistency(self, file_path, text):
+    @staticmethod
+    def calculate_consistency(file_path, text):
         try:
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-            pt_file = self.pt_file
+            pt_file = hf_hub_download(repo_id="lukewys/laion_clap", filename="630k-best.pt")
             clap_metric = CLAPTextConsistencyMetric(pt_file).to(device)
             def convert_audio(audio, from_rate, to_rate, to_channels):
                 resampler = torchaudio.transforms.Resample(orig_freq=from_rate, new_freq=to_rate)
@@ -57,23 +58,23 @@ class MetricEvaluator(AIModelService):
 
 class MusicQualityEvaluator:
     def __init__(self):
-        self.metric_evaluator = MetricEvaluator()
+        pass
 
     def evaluate_music_quality(self, file_path, text=None):
         try:
-            snr_value = self.metric_evaluator.calculate_snr(file_path)
+            snr_value = MetricEvaluator.calculate_snr(file_path)
             print(f'SNR: {snr_value} dB')
         except:
             print("SNR could not be calculated")
 
         try:
-            smoothness_score = self.metric_evaluator.calculate_smoothness(file_path)
+            smoothness_score = MetricEvaluator.calculate_smoothness(file_path)
             print(f'Smoothness Score: {smoothness_score}')
         except:
             print("Smoothness could not be calculated")
 
         try:
-            consistency_score = self.metric_evaluator.calculate_consistency(file_path, text)
+            consistency_score = MetricEvaluator.calculate_consistency(file_path, text)
             print(f"Consistency Score: {consistency_score}")
         except:
             print("Consistency could not be calculated")
