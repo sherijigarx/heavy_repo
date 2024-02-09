@@ -146,7 +146,7 @@ def main(config):
     try:
         if config.ms_model_path or config.model == "microsoft/speecht5_tts":
             model_path = config.ms_model_path if config.ms_model_path else config.model
-            tts_models = TextToSpeechModels(tts_model_path=model_path)
+            tts_models = TextToSpeechModels(model_path=model_path)
             bt.logging.info(f"Using the Microsoft TTS model from: {model_path}")
 
         elif config.fb_model_path or config.model == "facebook/mms-tts-eng":
