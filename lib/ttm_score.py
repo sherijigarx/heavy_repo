@@ -10,8 +10,7 @@ from classes.aimodel import AIModelService
 class MetricEvaluator(AIModelService):
     def __init__(self):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.p_file = self.pt_file
-        self.clap_metric = CLAPTextConsistencyMetric(self.p_file).to(self.device)
+        self.clap_metric = CLAPTextConsistencyMetric(self.pt_file).to(self.device)
         self.resampler = torchaudio.transforms.Resample(orig_freq=None, new_freq=48000)  # Adjust as necessary
 
     @staticmethod
