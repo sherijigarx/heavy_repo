@@ -56,9 +56,11 @@ class MetricEvaluator(AIModelService):
 
 class MusicQualityEvaluator:
     def __init__(self):
-        self.metric_evaluator = MetricEvaluator()
+        pass
 
     def evaluate_music_quality(self, file_path, text=None):
+        self.metric_evaluator = MetricEvaluator()
+
         try:
             snr_value = self.metric_evaluator.calculate_snr(file_path)
             print(f'SNR: {snr_value} dB')
