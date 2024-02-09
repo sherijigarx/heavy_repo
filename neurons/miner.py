@@ -189,7 +189,6 @@ def main(config):
         if config.bark_vc_path or config.clone_model == "bark/voiceclone":
             bt.logging.info(f"Checking the path of the model supplies: {config.bark_vc_path}")
             bark_vc_model = config.bark_vc_path if config.bark_vc_path else None
-            bt.logging.info(f"Using the Voice Clone with the supplied model: {bark_vc_model}")
             voice_clone_model = ModelLoader(model_dir=bark_vc_model)
         elif config.clone_model is not None and config.clone_model == "elevenlabs/eleven" and config.eleven_api is not None:
             bt.logging.info(f"Using the Voice Clone with the supplied model: {config.clone_model}")

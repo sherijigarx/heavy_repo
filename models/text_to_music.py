@@ -38,7 +38,6 @@ class MusicGenerator:
                 return_tensors="pt",
             ).to(self.device)
             audio_values = self.model.generate(**inputs, max_new_tokens=750)
-            print(audio_values[0, 0])
             return audio_values[0, 0].cpu().numpy()
         except Exception as e:
             print(f"An error occurred with {self.model_name}: {e}")
