@@ -9,7 +9,8 @@ from classes.aimodel import AIModelService
 
 class MetricEvaluator(AIModelService):
     def __init__(self):
-        super().__init__()
+        # super().__init__()
+        pass
 
     @staticmethod
     def calculate_snr(file_path):
