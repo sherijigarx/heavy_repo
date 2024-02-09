@@ -19,6 +19,7 @@ import platform
 import psutil
 import GPUtil
 import subprocess
+from huggingface_hub import hf_hub_download
 
 class AIModelService:
     _scores = None
@@ -34,10 +35,12 @@ class AIModelService:
         self.setup_metagraph()
         self.vcdnp = self.config.vcdnp
         self.max_mse = self.config.max_mse
+        self.pt_file = hf_hub_download(repo_id="lukewys/laion_clap", filename="630k-best.pt")
         if AIModelService._scores is None:
             AIModelService._scores = torch.zeros_like(self.metagraph.S, dtype=torch.float32)
         self.scores = AIModelService._scores
         self.uid = self.metagraph.hotkeys.index(self.wallet.hotkey.ss58_address)
+
 
     def get_config(self):
         parser = argparse.ArgumentParser()

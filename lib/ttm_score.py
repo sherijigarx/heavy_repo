@@ -1,19 +1,15 @@
-from huggingface_hub import hf_hub_download
-from transformers import AutoProcessor, MusicgenForConditionalGeneration
-import scipy.io.wavfile
 import numpy as np
 import librosa
 import torch
 import torchaudio
 from scipy.signal import hilbert
-from pathlib import Path
 from audiocraft.metrics import CLAPTextConsistencyMetric
-import subprocess
-import os
+from classes.aimodel import AIModelService
 
-class MetricEvaluator:
+
+class MetricEvaluator(AIModelService):
     def __init__(self):
-        self.pt_file = hf_hub_download(repo_id="lukewys/laion_clap", filename="630k-best.pt")
+        super().__init__()
 
     @staticmethod
     def calculate_snr(file_path):
@@ -60,23 +56,23 @@ class MetricEvaluator:
 
 class MusicQualityEvaluator:
     def __init__(self):
-        self.metric_evaluator = MetricEvaluator()
+        pass
 
     def evaluate_music_quality(self, file_path, text=None):
         try:
-            snr_value = self.metric_evaluator.calculate_snr(file_path)
+            snr_value = MetricEvaluator.calculate_snr(file_path)
             print(f'SNR: {snr_value} dB')
         except:
             print("SNR could not be calculated")
 
         try:
-            smoothness_score = self.metric_evaluator.calculate_smoothness(file_path)
+            smoothness_score = MetricEvaluator.calculate_smoothness(file_path)
             print(f'Smoothness Score: {smoothness_score}')
         except:
             print("Smoothness could not be calculated")
 
         try:
-            consistency_score = self.metric_evaluator.calculate_consistency(file_path, text)
+            consistency_score = MetricEvaluator.calculate_consistency(file_path, text)
             print(f"Consistency Score: {consistency_score}")
         except:
             print("Consistency could not be calculated")

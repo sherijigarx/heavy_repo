@@ -37,8 +37,6 @@ class MusicGenerationService(AIModelService):
         self.islocaltts = False
         self.p_index = 0
         self.filtered_axon = []
-        self.me = lib.ttm_score.MetricEvaluator()
-        self.score_object = lib.ttm_score.MusicQualityEvaluator()
         
         ###################################### DIRECTORY STRUCTURE ###########################################
         self.ttm_source_dir = os.path.join(audio_subnet_path, "ttm_source")
@@ -237,10 +235,9 @@ class MusicGenerationService(AIModelService):
         float: The calculated score.
         """
         try:
-
-
+            score_object = lib.ttm_score.MusicQualityEvaluator()
             # Call the scoring function from lib.reward
-            score = self.score_object.evaluate_music_quality(output_path, prompt)
+            score = score_object.evaluate_music_quality(output_path, prompt)
             return score
         except Exception as e:
             bt.logging.error(f"Error scoring output: {e}")
