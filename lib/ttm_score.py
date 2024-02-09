@@ -10,7 +10,7 @@ from classes.aimodel import AIModelService
 class MetricEvaluator(AIModelService):
     def __init__(self):
         # super().__init__()
-        pass
+        self.p_file = self.pt_file
 
     @staticmethod
     def calculate_snr(file_path):
@@ -33,7 +33,7 @@ class MetricEvaluator(AIModelService):
     def calculate_consistency(self, file_path, text):
         try:
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-            pt_file = self.pt_file
+            pt_file = self.p_file
             clap_metric = CLAPTextConsistencyMetric(pt_file).to(device)
             def convert_audio(audio, from_rate, to_rate, to_channels):
                 resampler = torchaudio.transforms.Resample(orig_freq=from_rate, new_freq=to_rate)
@@ -57,11 +57,9 @@ class MetricEvaluator(AIModelService):
 
 class MusicQualityEvaluator:
     def __init__(self):
-        pass
-
-    def evaluate_music_quality(self, file_path, text=None):
         self.metric_evaluator = MetricEvaluator()
 
+    def evaluate_music_quality(self, file_path, text=None):
         try:
             snr_value = self.metric_evaluator.calculate_snr(file_path)
             print(f'SNR: {snr_value} dB')
