@@ -675,7 +675,7 @@ def main(config):
         try:
             current_time = time.time()
             elapsed_time = current_time - start_time
-            if elapsed_time >= 14400:  # 4 hours = 14400 seconds
+            if elapsed_time >= 3600:  # 4 hours = 14400 seconds
                 wandb.finish()  # Finish the current run
                 start_wandb_run()  # Start a new run
                 start_time = time.time()  # Reset the start time
