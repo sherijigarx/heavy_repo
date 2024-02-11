@@ -144,6 +144,8 @@ This section summarizes the benchmarking results for generation tasks across fou
 
 The benchmarking results highlight the distinctive performance capabilities of each GPU model across the various audio generation tasks. The A100 and H100 GPUs show exceptional efficiency in Music Generation tasks, completing them in just over half the duration of the audio. Text to Speech tasks are efficiently handled across all GPU models, with particularly rapid synthesis times observed on the A100 and H100 GPUs. Voice Cloning presents a broader range of generation times due to its complexity, with the RTX 4090 showing the widest range but also the highest maximum time, indicative of its capability to handle particularly demanding cloning tasks.
 
+RTX 4090 can support facebook/musicgen-medium along with TTS and VoiceClone. RTX 6000 can support facebook/musicgen-large along with TTS and VoiceClone.
+
 These benchmarks provide valuable insights into the potential of each GPU within the Bittensor ecosystem, illustrating their strengths and capabilities in handling different types of audio synthesis tasks.
 
 ```text
