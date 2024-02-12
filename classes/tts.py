@@ -108,7 +108,7 @@ class TextToSpeechService(AIModelService):
                 await self.main_loop_logic(step)
                 step += 1
                 await asyncio.sleep(0.5)  # Adjust the sleep time as needed
-                if step % 50 == 0:
+                if step % 50 == 0 and self.config.auto_update == 'yes':
                     lib.utils.try_update()
             except KeyboardInterrupt:
                 print("Keyboard interrupt detected. Exiting TextToSpeechService.")
@@ -321,8 +321,7 @@ class TextToSpeechService(AIModelService):
         filtered_uid = [item[0] for item in filtered_zipped_uid] if filtered_zipped_uid else []
         self.filtered_axon = filtered_uid
         bt.logging.info(f"filtered_uids:{filtered_uids}")
-        # dendrites_to_query = random.sample( filtered_uids, min( dendrites_per_query, len(filtered_uids) ) )
-        dendrites_to_query = [filtered_uids[0], filtered_uids[1], filtered_uids[20]]
+        dendrites_to_query = random.sample( filtered_uids, min( dendrites_per_query, len(filtered_uids) ) )
         bt.logging.info(f"dendrites_to_query:{dendrites_to_query}")
         return dendrites_to_query
 
