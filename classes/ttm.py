@@ -200,7 +200,7 @@ class MusicGenerationService(AIModelService):
             if self.islocaltts:
                 output_path = os.path.join(self.ttm_target_dir, f'{self.p_index}_output_{axon.hotkey}.wav')
             else:
-                output_path = os.path.join('/tmp', f'output_{axon.hotkey}.wav')
+                output_path = os.path.join('/tmp', f'output_music_{axon.hotkey}.wav')
             
             # Check if any WAV file with .wav extension exists and delete it
             # existing_wav_files = [f for f in os.listdir('/tmp') if f.endswith('.wav')]
