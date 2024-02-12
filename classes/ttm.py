@@ -52,8 +52,8 @@ class MusicGenerationService(AIModelService):
         ###################################### DIRECTORY STRUCTURE ###########################################
 
     def load_prompts(self):
-        gs_dev = load_dataset("etechgrid/Prompts_for_Voice_cloning_and_TTS")
-        self.prompts = gs_dev['train']['text']
+        gs_dev = load_dataset("etechgrid/prompts_for_TTM")
+        self.prompts = gs_dev['train']['Title']
         return self.prompts
         
     def load_local_prompts(self):
