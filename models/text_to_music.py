@@ -11,26 +11,23 @@
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
+import torchaudio
+import random
 import torch
+import os
 from transformers import AutoProcessor, MusicgenForConditionalGeneration
+import scipy.io.wavfile
 import numpy as np
 import librosa
-import torchaudio
 import torch
-from torch.nn import DataParallel
+import torchaudio
 
 class MusicGenerator:
     def __init__(self, model_path="facebook/musicgen-medium"):
-        self.model_name = model_path
+        self.model_name = model_path  # Use the provided model path or default to 'facebook/musicgen-medium'
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        
         self.processor = AutoProcessor.from_pretrained(self.model_name)
         self.model = MusicgenForConditionalGeneration.from_pretrained(self.model_name)
-        
-        if torch.cuda.device_count() > 1:
-            print(f"Using {torch.cuda.device_count()} GPUs!")
-            self.model = DataParallel(self.model)
-        
         self.model.to(self.device)
 
     def generate_music(self, prompt):
@@ -40,12 +37,8 @@ class MusicGenerator:
                 padding=True,
                 return_tensors="pt",
             ).to(self.device)
-            
-            # Check if the model is wrapped with DataParallel and access the original model
-            model_to_use = self.model.module if isinstance(self.model, DataParallel) else self.model
-            
-            audio_values = model_to_use.generate(**inputs, max_new_tokens=750)
-            return audio_values.cpu().numpy()
+            audio_values = self.model.generate(**inputs, max_new_tokens=750)
+            return audio_values[0, 0].cpu().numpy()
         except Exception as e:
             print(f"An error occurred with {self.model_name}: {e}")
             return None
