@@ -12,6 +12,7 @@ Follow these steps to install the necessary components:
 git clone https://github.com/UncleTensor/AudioSubnet.git
 cd AudioSubnet
 git checkout main
+pip install -e fseq/
 pip install -r requirements.txt
 python -m pip install -e . 
 wandb login

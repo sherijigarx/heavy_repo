@@ -29,7 +29,7 @@ class MusicGenerationService(AIModelService):
     def __init__(self):
         super().__init__()  # Initializes base class components
         self.load_prompts()
-        self.total_dendrites_per_query = 25  # 25
+        self.total_dendrites_per_query = 10
         self.minimum_dendrites_per_query = 3  # Example value, adjust as needed
         self.current_block = self.subtensor.block
         self.last_updated_block = self.current_block - (self.current_block % 100)
@@ -108,6 +108,7 @@ class MusicGenerationService(AIModelService):
                 self.p_index = p_index
                 filtered_axons = [self.metagraph.axons[i] for i in self.get_filtered_axons()]
                 bt.logging.info(f"--------------------------------- Prompt are being used locally for Text-To-Music ---------------------------------")
+                bt.logging.info(f"______________TTM-Prompt______________: {lprompt}")
                 responses = self.query_network(filtered_axons,lprompt)
                 self.process_responses(filtered_axons,responses, lprompt)
 
@@ -124,7 +125,7 @@ class MusicGenerationService(AIModelService):
             while len(g_prompt) > 256:
                 bt.logging.error(f'The length of current Prompt is greater than 256. Skipping current prompt.')
                 g_prompt = random.choice(g_prompts)
-            if step % 2 == 0:
+            if step % 150 == 0:
                 filtered_axons = [self.metagraph.axons[i] for i in self.get_filtered_axons()]
                 bt.logging.info(f"--------------------------------- Prompt are being used from HuggingFace Dataset for Text-To-Music ---------------------------------")
                 bt.logging.info(f"______________TTM-Prompt______________: {g_prompt}")
@@ -144,7 +145,7 @@ class MusicGenerationService(AIModelService):
             filtered_axons,
             lib.protocol.MusicGeneration(roles=["user"], text_input=prompt),
             deserialize=True,
-            timeout=150,
+            timeout=120,
         )
         return responses
     
@@ -177,7 +178,7 @@ class MusicGenerationService(AIModelService):
                 bt.logging.success(f"Received music output from {axon.hotkey}")
                 self.handle_music_output(axon, music_output, prompt, response.model_name)
             elif response.dendrite.status_code != 403:
-                self.punish(axon, service="Text-To-Speech", punish_message=response.dendrite.status_message)
+                self.punish(axon, service="Text-To-Music", punish_message=response.dendrite.status_message)
             else:
                 pass
         except Exception as e:
@@ -203,12 +204,12 @@ class MusicGenerationService(AIModelService):
                 output_path = os.path.join('/tmp', f'output_music_{axon.hotkey}.wav')
             
             # Check if any WAV file with .wav extension exists and delete it
-            # existing_wav_files = [f for f in os.listdir('/tmp') if f.endswith('.wav')]
-            # for existing_file in existing_wav_files:
-            #     try:
-            #         os.remove(os.path.join('/tmp', existing_file))
-            #     except Exception as e:
-            #         bt.logging.error(f"Error deleting existing WAV file: {e}")
+            existing_wav_files = [f for f in os.listdir('/tmp') if f.endswith('.wav')]
+            for existing_file in existing_wav_files:
+                try:
+                    os.remove(os.path.join('/tmp', existing_file))
+                except Exception as e:
+                    bt.logging.error(f"Error deleting existing WAV file: {e}")
 
             # Save the audio file
             sampling_rate = 32000
