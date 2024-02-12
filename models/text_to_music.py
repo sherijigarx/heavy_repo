@@ -40,10 +40,11 @@ class MusicGenerator:
                 padding=True,
                 return_tensors="pt",
             ).to(self.device)
-            audio_values = self.model.generate(**inputs, max_new_tokens=750)
-            # Handle the output based on whether the model is wrapped by DataParallel
-            if isinstance(self.model, DataParallel):
-                audio_values = audio_values[0]  # Adjusting the output tensor accordingly
+            
+            # Check if the model is wrapped with DataParallel and access the original model
+            model_to_use = self.model.module if isinstance(self.model, DataParallel) else self.model
+            
+            audio_values = model_to_use.generate(**inputs, max_new_tokens=750)
             return audio_values.cpu().numpy()
         except Exception as e:
             print(f"An error occurred with {self.model_name}: {e}")
