@@ -53,7 +53,7 @@ class MusicGenerationService(AIModelService):
 
     def load_prompts(self):
         gs_dev = load_dataset("etechgrid/prompts_for_TTM")
-        self.prompts = gs_dev['train']['Title']
+        self.prompts = gs_dev['train']['text']
         return self.prompts
         
     def load_local_prompts(self):
