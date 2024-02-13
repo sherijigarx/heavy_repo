@@ -95,7 +95,7 @@ class VoiceCloningService(AIModelService):
                 traceback.print_exc()
 
     async def process_huggingface_prompts(self, step):
-        if step % 70 == 0:
+        if step % 50 == 0:
             bt.logging.info(f"-------The Voice Clone request recieved from validator-------------------------- Prompt and voices are being used from HuggingFace Dataset for Voice Clone at Step: {step} ---------------------------------")
             self.filename = ""
             self.text_input = random.choice(self.prompts)
@@ -115,7 +115,7 @@ class VoiceCloningService(AIModelService):
             await self.generate_voice_clone(self.text_input, clone_input, sample_rate)
 
     async def process_local_files(self, step, sound_files):
-        if step % 50 == 0 and sound_files:
+        if step % 25 == 0 and sound_files:
             bt.logging.info(f"--------------------------------- Prompt and voices are being used locally for Voice Clone at Step: {step} ---------------------------------")
             # Extract the base name (without extension) of each sound file
             sound_file_basenames = [os.path.splitext(f)[0] for f in sound_files]
