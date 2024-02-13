@@ -48,9 +48,6 @@ import psutil
 import GPUtil
 import datetime as dt
 import subprocess
-import warnings
-# Ignore all warnings
-warnings.filterwarnings("ignore")
 
 
 # Set the project root path

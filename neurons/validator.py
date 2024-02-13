@@ -20,9 +20,6 @@
 import os
 import sys
 import asyncio
-import warnings
-# Ignore all warnings
-warnings.filterwarnings("ignore")
 
 
 # Set the project root path

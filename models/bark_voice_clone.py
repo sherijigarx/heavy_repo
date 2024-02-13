@@ -3,9 +3,6 @@ import torchaudio
 import numpy as np
 import os
 import sys
-import warnings
-# Ignore all warnings
-warnings.filterwarnings("ignore")
 
 
 # Set the project root path

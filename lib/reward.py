@@ -41,9 +41,6 @@ from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 import lib
 import pandas as pd
-import warnings
-# Ignore all warnings
-warnings.filterwarnings("ignore")
 
 
 
