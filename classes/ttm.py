@@ -130,7 +130,7 @@ class MusicGenerationService(AIModelService):
                 filtered_axons = self.get_filtered_axons_from_combinations()
                 bt.logging.info(f"--------------------------------- Prompt are being used from HuggingFace Dataset for Text-To-Music ---------------------------------")
                 bt.logging.info(f"______________TTM-Prompt______________: {g_prompt}")
-                bt.logging.info(f"______________Filtered Axons for Network Query in TTM______________: {filtered_axons}")
+                # bt.logging.info(f"______________Filtered Axons for Network Query in TTM______________: {filtered_axons}")
                 responses = self.query_network(filtered_axons,g_prompt)
                 self.process_responses(filtered_axons,responses, g_prompt)
 
@@ -253,10 +253,12 @@ class MusicGenerationService(AIModelService):
 
         if self.combinations:
             current_combination = self.combinations.pop(0)
+            bt.logging.info(f"Current Combination for TTM: {current_combination}")
             filtered_axons = [self.metagraph.axons[i] for i in current_combination]
         else:
             self.get_filtered_axons()
             current_combination = self.combinations.pop(0)
+            bt.logging.info(f"Current Combination for TTM: {current_combination}")
             filtered_axons = [self.metagraph.axons[i] for i in current_combination]
 
         return filtered_axons
