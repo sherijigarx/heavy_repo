@@ -111,7 +111,7 @@ class MusicGenerationService(AIModelService):
                     continue
                 self.p_index = p_index
                 filtered_axons = self.get_filtered_axons_from_combinations()
-                bt.logging.info(f"--------------------------------- Prompt are being used locally for Text-To-Music ---------------------------------")
+                bt.logging.info(f"--------------------------------- Prompt are being used locally for Text-To-Music at Step: {step}  ---------------------------------")
                 bt.logging.info(f"______________TTM-Prompt______________: {lprompt}")
                 responses = self.query_network(filtered_axons,lprompt)
                 self.process_responses(filtered_axons,responses, lprompt)
@@ -128,9 +128,9 @@ class MusicGenerationService(AIModelService):
             while len(g_prompt) > 256:
                 bt.logging.error(f'The length of current Prompt is greater than 256. Skipping current prompt.')
                 g_prompt = random.choice(g_prompts)
-            if step % 10 == 0:
+            if step % 25 == 0:
                 filtered_axons = self.get_filtered_axons_from_combinations()
-                bt.logging.info(f"--------------------------------- Prompt are being used from HuggingFace Dataset for Text-To-Music ---------------------------------")
+                bt.logging.info(f"--------------------------------- Prompt are being used from HuggingFace Dataset for Text-To-Music at Step: {step}  ---------------------------------")
                 bt.logging.info(f"______________TTM-Prompt______________: {g_prompt}")
                 # bt.logging.info(f"______________Filtered Axons for Network Query in TTM______________: {filtered_axons}")
                 responses = self.query_network(filtered_axons,g_prompt)
