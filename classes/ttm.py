@@ -16,6 +16,9 @@ import lib
 import traceback
 import pandas as pd
 import sys
+import warnings
+# Ignore all warnings
+warnings.filterwarnings("ignore")
 # Set the project root path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 # Set the 'AudioSubnet' directory path
@@ -120,13 +123,12 @@ class MusicGenerationService(AIModelService):
                     scores = scores * torch.Tensor([self.metagraph.neurons[uid].axon_info.ip != '0.0.0.0' for uid in self.metagraph.uids])
             self.islocaltts = False
         else:
-            bt.logging.info("No prompts found or wrong file name was given. Using Huggingface Dataset for prompts.")
             g_prompts = self.load_prompts()
             g_prompt = random.choice(g_prompts)
             while len(g_prompt) > 256:
                 bt.logging.error(f'The length of current Prompt is greater than 256. Skipping current prompt.')
                 g_prompt = random.choice(g_prompts)
-            if step % 30 == 0:
+            if step % 25 == 0:
                 filtered_axons = self.get_filtered_axons_from_combinations()
                 bt.logging.info(f"--------------------------------- Prompt are being used from HuggingFace Dataset for Text-To-Music ---------------------------------")
                 bt.logging.info(f"______________TTM-Prompt______________: {g_prompt}")
@@ -151,26 +153,12 @@ class MusicGenerationService(AIModelService):
         )
         return responses
     
-    def update_block(self):
-        self.current_block = self.subtensor.block
-        if self.current_block - self.last_updated_block > 50:
-            bt.logging.info(f"Updating weights. Last update was at block {self.last_updated_block}")
-            bt.logging.info(f"Current block is {self.current_block}")
-            self.update_weights(self.scores)
-            self.last_updated_block = self.current_block
-        else:
-            bt.logging.info(f"Updating weights. Last update was at block:  {self.last_updated_block}")
-            bt.logging.info(f"Current block is: {self.current_block}")
-            bt.logging.info(f"Next update will be at block: {self.last_updated_block + 50}")
-            bt.logging.info(f"Skipping weight update. Last update was at block {self.last_updated_block}")
-
     def process_responses(self,filtered_axons, responses, prompt):
         for axon, response in zip(filtered_axons, responses):
             if response is not None and isinstance(response, lib.protocol.MusicGeneration):
                 self.process_response(axon, response, prompt)
         
         bt.logging.info(f"Scores: {self.scores}")
-        self.update_block()
 
 
     def process_response(self, axon, response, prompt):
@@ -310,36 +298,3 @@ class MusicGenerationService(AIModelService):
             filtered_uids = filtered_uids[subset_length:]
         return self.combinations
 
-    def update_weights(self, scores):
-        # Calculate new weights from scores
-        # if all scores are nan set all weights to 0
-        if torch.isnan(scores).all():
-            bt.logging.trace("All scores are nan, setting all weights to 0")
-            scores = torch.zeros_like(scores)
-        # convert scores from list to tensor
-        # scores = torch.Tensor(scores)
-        weights = scores / torch.sum(scores)
-        bt.logging.info(f"Setting weights: {weights}")
-
-        # Process weights for the subnet
-        processed_uids, processed_weights = bt.utils.weight_utils.process_weights_for_netuid(
-            uids=self.metagraph.uids,
-            weights=weights,
-            netuid=self.config.netuid,
-            subtensor=self.subtensor
-        )
-        bt.logging.info(f"Processed weights: {processed_weights}")
-        bt.logging.info(f"Processed uids: {processed_uids}")
-
-        # Set weights on the Bittensor network
-        result = self.subtensor.set_weights(
-            netuid=self.config.netuid,  # Subnet to set weights on
-            wallet=self.wallet,         # Wallet to sign set weights using hotkey
-            uids=processed_uids,        # Uids of the miners to set weights for
-            weights=processed_weights   # Weights to set for the miners
-        )
-
-        if result:
-            bt.logging.success('Successfully set weights.')
-        else:
-            bt.logging.error('Failed to set weights.')

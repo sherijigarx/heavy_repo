@@ -21,6 +21,10 @@ import numpy as np
 import librosa
 import torch
 import torchaudio
+import warnings
+# Ignore all warnings
+warnings.filterwarnings("ignore")
+
 
 class MusicGenerator:
     def __init__(self, model_path="facebook/musicgen-medium"):

@@ -4,6 +4,10 @@ import torchaudio.transforms as T
 import bittensor as bt
 from lib.reward import score
 import math
+import warnings
+# Ignore all warnings
+warnings.filterwarnings("ignore")
+
 
 
 class CloneScore:

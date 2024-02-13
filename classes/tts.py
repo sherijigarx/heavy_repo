@@ -16,6 +16,10 @@ import pandas as pd
 import sys
 import wandb
 import datetime as dt
+import warnings
+# Ignore all warnings
+warnings.filterwarnings("ignore")
+
 # Set the project root path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 # Set the 'AudioSubnet' directory path

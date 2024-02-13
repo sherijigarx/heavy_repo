@@ -10,6 +10,10 @@ from pathlib import Path
 from audiocraft.metrics import CLAPTextConsistencyMetric
 import subprocess
 import os
+import warnings
+# Ignore all warnings
+warnings.filterwarnings("ignore")
+
 
 class MetricEvaluator:
     @staticmethod
