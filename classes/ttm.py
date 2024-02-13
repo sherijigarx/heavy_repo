@@ -37,6 +37,7 @@ class MusicGenerationService(AIModelService):
         self.islocaltts = False
         self.p_index = 0
         self.filtered_axon = []
+        self.combinations = []
         
         ###################################### DIRECTORY STRUCTURE ###########################################
         self.ttm_source_dir = os.path.join(audio_subnet_path, "ttm_source")
@@ -106,7 +107,7 @@ class MusicGenerationService(AIModelService):
                     bt.logging.error(f'The length of current Prompt is greater than 256. Skipping current prompt.')
                     continue
                 self.p_index = p_index
-                filtered_axons = [self.metagraph.axons[i] for i in self.get_filtered_axons()]
+                filtered_axons = self.get_filtered_axons_from_combinations()
                 bt.logging.info(f"--------------------------------- Prompt are being used locally for Text-To-Music ---------------------------------")
                 bt.logging.info(f"______________TTM-Prompt______________: {lprompt}")
                 responses = self.query_network(filtered_axons,lprompt)
@@ -126,7 +127,7 @@ class MusicGenerationService(AIModelService):
                 bt.logging.error(f'The length of current Prompt is greater than 256. Skipping current prompt.')
                 g_prompt = random.choice(g_prompts)
             if step % 150 == 0:
-                filtered_axons = [self.metagraph.axons[i] for i in self.get_filtered_axons()]
+                filtered_axons = self.get_filtered_axons_from_combinations()
                 bt.logging.info(f"--------------------------------- Prompt are being used from HuggingFace Dataset for Text-To-Music ---------------------------------")
                 bt.logging.info(f"______________TTM-Prompt______________: {g_prompt}")
                 responses = self.query_network(filtered_axons,g_prompt)
@@ -244,6 +245,22 @@ class MusicGenerationService(AIModelService):
         except Exception as e:
             bt.logging.error(f"Error scoring output: {e}")
             return 0.0  # Return a default score in case of an error
+        
+    def get_filtered_axons_from_combinations(self):
+        if not self.combinations:
+            self.get_filtered_axons()
+
+        if self.combinations:
+            current_combination = self.combinations.pop(0)
+            filtered_axons = [self.metagraph.axons[i] for i in current_combination]
+        else:
+            self.get_filtered_axons()
+            current_combination = self.combinations.pop(0)
+            filtered_axons = [self.metagraph.axons[i] for i in current_combination]
+
+        return filtered_axons
+
+
 
     def get_filtered_axons(self):
         # Get the uids of all miners in the network.
@@ -280,9 +297,15 @@ class MusicGenerationService(AIModelService):
         filtered_uid = [item[0] for item in filtered_zipped_uid] if filtered_zipped_uid else []
         self.filtered_axon = filtered_uid
         bt.logging.info(f"filtered_uids:{filtered_uids}")
-        dendrites_to_query = random.sample( filtered_uids, min( dendrites_per_query, len(filtered_uids) ) )
-        bt.logging.info(f"dendrites_to_query:{dendrites_to_query}")
-        return dendrites_to_query
+        subset_length = min(dendrites_per_query, len(filtered_uids))
+        # Shuffle the order of members
+        random.shuffle(filtered_uids)
+        # Generate subsets of length 7 until all items are covered
+        while filtered_uids:
+            subset = filtered_uids[:subset_length]
+            self.combinations.append(subset)
+            filtered_uids = filtered_uids[subset_length:]
+        return self.combinations
 
     def update_weights(self, scores):
         # Calculate new weights from scores
