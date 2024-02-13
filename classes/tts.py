@@ -167,6 +167,7 @@ class TextToSpeechService(AIModelService):
                 filtered_axons = filtered_axons = self.get_filtered_axons_from_combinations()
                 bt.logging.info(f"--------------------------------- Prompt are being used from HuggingFace Dataset for TTS at Step: {step} ---------------------------------")
                 bt.logging.info(f"______________Prompt______________: {g_prompt}")
+                bt.logging.info(f"______________Filtered Axons for Network Query in TTS______________: {filtered_axons}")
                 responses = self.query_network(filtered_axons,g_prompt)
                 self.process_responses(filtered_axons,responses, g_prompt)
 

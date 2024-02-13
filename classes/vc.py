@@ -210,6 +210,7 @@ class VoiceCloningService(AIModelService):
     async def generate_voice_clone(self, text_input, clone_input, sample_rate):
         try:
             self.filtered_axons = self.get_filtered_axons_from_combinations()
+            bt.logging.info(f"______________Filtered Axons for Network Query in VC______________: {self.filtered_axons}")
             for ax in self.filtered_axons:
                 self.response = await self.dendrite.forward(
                     ax,
