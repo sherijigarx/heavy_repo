@@ -339,7 +339,6 @@ class TextToSpeechService(AIModelService):
         filtered_zipped_uid = list(filter(lambda x: x[1], zipped_uid))
         filtered_uid = [item[0] for item in filtered_zipped_uid] if filtered_zipped_uid else []
         self.filtered_axon = filtered_uid
-        bt.logging.info(f"filtered_uids:{filtered_uids}")
         subset_length = min(dendrites_per_query, len(filtered_uids))
         # Shuffle the order of members
         random.shuffle(filtered_uids)
