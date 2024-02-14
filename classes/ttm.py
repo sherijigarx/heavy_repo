@@ -40,7 +40,7 @@ class MusicGenerationService(AIModelService):
         self.p_index = 0
         self.filtered_axon = []
         self.combinations = []
-        self.duration = 15  #15 seconds music
+        self.duration = 750  #750 tokens = 15 seconds music
         
         ###################################### DIRECTORY STRUCTURE ###########################################
         self.ttm_source_dir = os.path.join(audio_subnet_path, "ttm_source")
@@ -208,7 +208,7 @@ class MusicGenerationService(AIModelService):
                 # Calculate the duration
                 duration = self.get_duration(output_path)
                 print(f"The duration of the audio file is {duration} seconds.")
-            if duration < self.duration:
+            if (duration * 50) < self.duration:
                 bt.logging.error(f"The duration of the audio file is less than {self.duration} seconds.Punishing the axon.")
                 self.punish(axon, service="Text-To-Music", punish_message=f"The duration of the audio file is less than {self.duration} seconds.")
                 return
