@@ -40,7 +40,7 @@ class MusicGenerationService(AIModelService):
         self.p_index = 0
         self.filtered_axon = []
         self.combinations = []
-        self.duration = 751.5  #750 tokens = 15 seconds music
+        self.duration = 752  #750 tokens = 15 seconds music
         
         ###################################### DIRECTORY STRUCTURE ###########################################
         self.ttm_source_dir = os.path.join(audio_subnet_path, "ttm_source")
