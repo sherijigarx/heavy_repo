@@ -146,7 +146,7 @@ class MusicGenerationService(AIModelService):
         
         responses = self.dendrite.query(
             filtered_axons,
-            lib.protocol.MusicGeneration(roles=["user"], text_input=prompt,duration=self.duration ),
+            lib.protocol.MusicGeneration(roles=["user"], text_input=prompt, duration=self.duration ),
             deserialize=True,
             timeout=120,
         )
@@ -174,7 +174,7 @@ class MusicGenerationService(AIModelService):
             bt.logging.error(f'An error occurred while handling speech output: {e}')
 
 
-    def get_duration(wav_file_path):
+    def get_duration(self, wav_file_path):
         with contextlib.closing(wave.open(wav_file_path,'r')) as f:
             frames = f.getnframes()
             rate = f.getframerate()
