@@ -11,7 +11,6 @@ from audiocraft.metrics import CLAPTextConsistencyMetric
 import subprocess
 import os
 
-
 class MetricEvaluator:
     @staticmethod
     def calculate_snr(file_path):

@@ -31,7 +31,6 @@ import torch
 import os
 
 
-
 # Speaker Embedding Generator using SpeechBrain's Speaker Recognition Model
 class SpeakerRecognizer:
     def __init__(self):

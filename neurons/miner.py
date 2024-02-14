@@ -49,7 +49,6 @@ import GPUtil
 import datetime as dt
 import subprocess
 
-
 # Set the project root path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -256,7 +255,7 @@ def main(config):
     def start_wandb_run():
         wandb.init(
             name=name,
-            project="AudioSubnet_Miner",
+            project="AudioSubnet_Miner", 
             entity="subnet16team",
             config={
                 "uid": my_subnet_uid,
@@ -620,7 +619,7 @@ def main(config):
 
     def ProcessMusic(synapse: lib.protocol.MusicGeneration) -> lib.protocol.MusicGeneration:
         bt.logging.info(f"Generating music with the model: {config.music_model}")
-        music = ttm_models.generate_music(synapse.text_input)
+        music = ttm_models.generate_music(synapse.text_input, synapse.duration)
 
         # Check if 'music' contains valid audio data
         if music is None:

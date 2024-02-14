@@ -43,7 +43,6 @@ import lib
 import pandas as pd
 
 
-
 #%% Models
 class NISQA(nn.Module):
     '''
