@@ -32,7 +32,7 @@ class MusicGenerationService(AIModelService):
         super().__init__()  # Initializes base class components
         self.load_prompts()
         self.total_dendrites_per_query = 30
-        self.minimum_dendrites_per_query = 3  # Example value, adjust as needed
+        self.minimum_dendrites_per_query = 10  # Example value, adjust as needed
         self.current_block = self.subtensor.block
         self.last_updated_block = self.current_block - (self.current_block % 100)
         self.last_reset_weights_block = self.current_block
