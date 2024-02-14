@@ -208,7 +208,7 @@ class MusicGenerationService(AIModelService):
                 # Calculate the duration
                 duration = self.get_duration(output_path)
                 print(f"The duration of the audio file is {duration} seconds.")
-                token = duration * 50.2
+                token = duration * 50.3
                 bt.logging.info(f"The duration of the audio file is {duration} seconds.")
                 bt.logging.info(f"------------------------------- Token -------------------------------: {token}")
                 bt.logging.info(f"------------------------------- Duration -------------------------------: {self.duration}")
