@@ -208,13 +208,13 @@ class MusicGenerationService(AIModelService):
                 # Calculate the duration
                 duration = self.get_duration(output_path)
                 print(f"The duration of the audio file is {duration} seconds.")
-                token = duration * 50.1
+                token = duration * 50.2
                 bt.logging.info(f"The duration of the audio file is {duration} seconds.")
                 bt.logging.info(f"------------------------------- Token -------------------------------: {token}")
                 bt.logging.info(f"------------------------------- Duration -------------------------------: {self.duration}")
             if token < self.duration:
-                bt.logging.error(f"The duration of the audio file is less than {self.duration / 50.1} seconds.Punishing the axon.")
-                self.punish(axon, service="Text-To-Music", punish_message=f"The duration of the audio file is less than {self.duration / 50.1} seconds.")
+                bt.logging.error(f"The duration of the audio file is less than {self.duration / 50.2} seconds.Punishing the axon.")
+                self.punish(axon, service="Text-To-Music", punish_message=f"The duration of the audio file is less than {self.duration / 50.2} seconds.")
                 return
             else:
                 # Score the output and update the weights
