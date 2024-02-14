@@ -31,8 +31,8 @@ class MusicGenerationService(AIModelService):
     def __init__(self):
         super().__init__()  # Initializes base class components
         self.load_prompts()
-        self.total_dendrites_per_query = 15
-        self.minimum_dendrites_per_query = 10  # Example value, adjust as needed
+        self.total_dendrites_per_query = 10
+        self.minimum_dendrites_per_query = 3  # Example value, adjust as needed
         self.current_block = self.subtensor.block
         self.last_updated_block = self.current_block - (self.current_block % 100)
         self.last_reset_weights_block = self.current_block
@@ -129,7 +129,7 @@ class MusicGenerationService(AIModelService):
             while len(g_prompt) > 256:
                 bt.logging.error(f'The length of current Prompt is greater than 256. Skipping current prompt.')
                 g_prompt = random.choice(g_prompts)
-            if step % 2 == 0:
+            if step % 40 == 0:
                 filtered_axons = self.get_filtered_axons_from_combinations()
                 bt.logging.info(f"--------------------------------- Prompt are being used from HuggingFace Dataset for Text-To-Music ---------------------------------")
                 bt.logging.info(f"______________TTM-Prompt______________: {g_prompt}")
@@ -203,15 +203,12 @@ class MusicGenerationService(AIModelService):
                 output_path = os.path.join('/tmp', f'output_music_{axon.hotkey}.wav')
                 sampling_rate = 32000
                 torchaudio.save(output_path, src=audio_data_int, sample_rate=sampling_rate)
-                print(f"Saved audio file to {output_path}")
+                bt.logging.info(f"Saved audio file to {output_path}")
 
                 # Calculate the duration
                 duration = self.get_duration(output_path)
-                print(f"The duration of the audio file is {duration} seconds.")
                 token = duration * 50.2
                 bt.logging.info(f"The duration of the audio file is {duration} seconds.")
-                bt.logging.info(f"------------------------------- Token -------------------------------: {token}")
-                bt.logging.info(f"------------------------------- Duration -------------------------------: {self.duration}")
             if token < self.duration:
                 bt.logging.error(f"The duration of the audio file is less than {self.duration / 50.2} seconds.Punishing the axon.")
                 self.punish(axon, service="Text-To-Music", punish_message=f"The duration of the audio file is less than {self.duration / 50.2} seconds.")
